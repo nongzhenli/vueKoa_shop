@@ -21,7 +21,8 @@ import {
 	Col,
 	Swipe,
 	SwipeItem,
-	Lazyload
+	Lazyload,
+	List
 } from 'vant'
 Vue.use(Button)
 .use(Row)
@@ -29,6 +30,7 @@ Vue.use(Button)
 .use(Swipe)
 .use(SwipeItem)
 .use(Lazyload)
+.use(List)
 
 Vue.config.productionTip = false
 

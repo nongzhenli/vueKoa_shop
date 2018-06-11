@@ -59,44 +59,35 @@
                             <img :src="item.image"
                                  width="80%" />
                             <div>{{item.goodsName}}</div>
-                            <div>￥{{item.price}} (￥{{item.mallPrice}})</div>
+                            <div>￥{{item.price | moneyFilter}} (￥{{item.mallPrice | moneyFilter}})</div>
                         </div>
                     </swiper-slide>
                 </swiper>
             </div>
         </div>
 
-        <!--floor one area-->
-        <div class="floor">
-            <div class="floor-anomaly">
-                <div class="floor-one">
-                    <img :src="floor1_0.image"
-                         width="100%" />
-                </div>
-                <div>
-                    <div class="floor-two">
-                        <img :src="floor1_1.image"
-                             width="100%" />
-                    </div>
-                    <div>
-                        <img :src="floor1_2.image"
-                             width="100%" />
-                    </div>
-                </div>
-            </div>
+        <floorComponent :floorData="floor1"
+                        :floorTitle="floorName.floor1"></floorComponent>
+        <floorComponent :floorData="floor2"
+                        :floorTitle="floorName.floor2"></floorComponent>
+        <floorComponent :floorData="floor3"
+                        :floorTitle="floorName.floor3"></floorComponent>
 
-            <div class="floor-rule">
-                <div v-for="(item ,index) in floor1.slice(3)"
-                     :key="index">
-                    <img :src="item.image"
-                         width="100%" />
-                </div>
+        <!--Hot Area-->
+        <div class="hot-area">
+            <div class="hot-title">热卖商品</div>
+            <div class="hot-goods">
+                <van-row gutter="0">
+                    <van-col span="12"
+                             v-for="(item,index) in hotGoods"
+                             :key="index">
+                        <goods-info :goodsImage="item.image"
+                                    :goodsName="item.name"
+                                    :goodsPrice="item.price"></goods-info>
+                    </van-col>
+                </van-row>
             </div>
-
         </div>
-
-        <!-- <swiperDefault></swiperDefault> -->
-        <!-- <swiperText></swiperText> -->
 
     </div>
 </template>
@@ -105,8 +96,13 @@
 import axios from "axios";
 import "swiper/dist/css/swiper.css";
 import { swiper, swiperSlide } from "vue-awesome-swiper";
+import { toMoney } from "@/filter/moneyFilter.js";
+import url from '@/serviceAPI.config.js'
+
 import swiperDefault from "../swiper/swiperDefault";
 import swiperText from "../swiper/swiperText";
+import floorComponent from "../component/floorComponent";
+import goodsInfo from "../component/goodsInfoComponent";
 
 export default {
     data() {
@@ -119,22 +115,30 @@ export default {
             category: [],
             adBanner: "",
             recommendGoods: [],
-            floor1: [],
-            floor1_0: {},
-            floor1_1: {},
-            floor1_2: {}
+            floor1: [], //楼层1的数据
+            floor2: [], //楼层1的数据
+            floor3: [], //楼层1的数据
+            floorName: {}, //楼层名称
+            hotGoods: [] //热卖商品
         };
     },
+    filters: {
+        moneyFilter(money) {
+            return toMoney(money);
+        }
+    },
+
     components: {
         swiper,
         swiperSlide,
         swiperDefault,
-        swiperText
+        swiperText,
+        floorComponent,
+        goodsInfo
     },
     created() {
         axios({
-            url:
-                "https://www.easy-mock.com/mock/5af056e03a995a256fe7a369/SmileVue/index",
+            url: url.getShoppingMallInfo,
             method: "get"
         })
             .then(response => {
@@ -145,11 +149,11 @@ export default {
                         response.data.data.advertesPicture.PICTURE_ADDRESS;
                     this.bannerPicArray = response.data.data.slides;
                     this.recommendGoods = response.data.data.recommend;
-                    this.floor1 = response.data.data.floor1;
-                    console.log(this.floor1);
-                    this.floor1_0 = this.floor1[0];
-                    this.floor1_1 = this.floor1[1];
-                    this.floor1_2 = this.floor1[2];
+                    this.floor1 = response.data.data.floor1; //楼层1数据
+                    this.floor2 = response.data.data.floor2; //楼层2数据
+                    this.floor3 = response.data.data.floor3; //楼层3数据
+                    this.floorName = response.data.data.floorName; //楼层名称
+                    this.hotGoods = response.data.data.hotGoods;
                 }
             })
             .catch(error => {
@@ -259,5 +263,13 @@ export default {
 }
 .floor-rule div:nth-child(odd) {
     border-right: 1px solid #ddd;
+}
+.hot-area {
+    text-align: center;
+    font-size: 14px;
+    height: 1.8rem;
+    line-height: 1.8rem;
+    background-color: #e8e8e8;
+    color: #333;
 }
 </style>
